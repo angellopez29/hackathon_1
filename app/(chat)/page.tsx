@@ -2,14 +2,9 @@
 
 import { useMemo, useState } from "react";
 
-const buttons = [
-  ["C", "DEL", "/"],
-  ["7", "8", "9", "*"],
-  ["4", "5", "6", "-"],
-  ["1", "2", "3", "+"],
-  ["0", ".", "="]
-];
-
+const numberButtons = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0", "."];
+const topRowButtons = ["C", "DEL", "%", "÷"];
+const sideOperatorButtons = ["×", "−", "+", "="];
 function evaluateExpression(expression: string) {
   const safeExpression = expression.replace(/[^0-9.+\-*/() ]/g, "");
   try {
@@ -63,9 +58,9 @@ export default function Page() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 text-white px-4 py-10">
-      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-2xl shadow-slate-900/40">
-        <div className="mb-6 rounded-3xl bg-slate-800/80 p-5 text-right text-4xl font-semibold tracking-tight text-slate-100">
+    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-6 text-white sm:py-10">
+      <div className="w-full max-w-[22rem] rounded-[2rem] border border-white/10 bg-slate-900/90 p-4 shadow-2xl shadow-slate-900/40 sm:p-5">
+        <div className="mb-5 min-h-[5.5rem] rounded-[1.5rem] bg-slate-800/80 p-4 text-right text-4xl font-semibold tracking-tight text-slate-100">
           {formattedDisplay}
         </div>
         {error ? (
@@ -73,26 +68,68 @@ export default function Page() {
             {error}
           </div>
         ) : null}
-        <div className="grid gap-3 text-lg sm:grid-cols-4">
-          {buttons.flat().map((label) => (
-            <button
-              key={label}
-              type="button"
-              className={
-                "rounded-2xl border border-white/10 px-4 py-5 font-semibold transition hover:bg-slate-700/90 " +
-                (label === "="
-                  ? "col-span-2 bg-indigo-500 text-white hover:bg-indigo-600"
-                  : label === "C" || label === "DEL"
-                  ? "bg-slate-700 text-slate-100 hover:bg-slate-600"
-                  : "/-*+".includes(label)
-                  ? "bg-slate-800 text-slate-200 hover:bg-slate-700"
-                  : "bg-slate-900 text-slate-100 hover:bg-slate-800")
-              }
-              onClick={() => handleButton(label)}
-            >
-              {label}
-            </button>
-          ))}
+        <div className="grid grid-cols-[1fr_5.2rem] gap-3 text-lg">
+          <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-4 gap-3">
+              {topRowButtons.map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-700 font-semibold text-slate-100 transition hover:bg-slate-600"
+                  onClick={() => handleButton(label)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              {numberButtons.map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-900 text-slate-100 font-semibold transition hover:bg-slate-800"
+                  onClick={() => handleButton(label)}
+                >
+                  {label}
+                </button>
+              ))}
+              <button
+                key="0"
+                type="button"
+                className="col-span-2 flex h-14 items-center justify-start rounded-2xl border border-white/10 bg-slate-900 pl-6 font-semibold text-slate-100 transition hover:bg-slate-800"
+                onClick={() => handleButton("0")}
+              >
+                0
+              </button>
+              <button
+                key="."
+                type="button"
+                className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-900 font-semibold text-slate-100 transition hover:bg-slate-800"
+                onClick={() => handleButton(".")}
+              >
+                .
+              </button>
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            {sideOperatorButtons.map((label) => (
+              <button
+                key={label}
+                type="button"
+                className={
+                  "flex h-14 items-center justify-center rounded-2xl border border-white/10 font-semibold transition " +
+                  (label === "="
+                    ? "bg-indigo-500 text-white hover:bg-indigo-600"
+                    : "bg-slate-800 text-slate-200 hover:bg-slate-700")
+                }
+                onClick={() => handleButton(label)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </main>
