@@ -2,11 +2,18 @@
 
 import { useMemo, useState } from "react";
 
-const numberButtons = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "."];
-const topRowButtons = ["C", "DEL", "%", "÷"];
-const sideOperatorButtons = ["×", "−", "+", "="];
+const numberRows = [
+  ["7", "8", "9"],
+  ["4", "5", "6"],
+  ["1", "2", "3"],
+];
+
+function normalizeExpression(expression: string) {
+  return expression.replace(/÷/g, "/").replace(/×/g, "*").replace(/−/g, "-");
+}
+
 function evaluateExpression(expression: string) {
-  const safeExpression = expression.replace(/[^0-9.+\-*/() ]/g, "");
+  const safeExpression = normalizeExpression(expression).replace(/[^0-9.+\-*/() ]/g, "");
   try {
     // eslint-disable-next-line no-new-func
     const result = new Function(`return ${safeExpression}`)();
@@ -40,6 +47,16 @@ export default function Page() {
       return;
     }
 
+    if (value === "%") {
+      const numericValue = Number(display);
+      if (Number.isFinite(numericValue)) {
+        setDisplay(String(numericValue / 100));
+      } else {
+        setDisplay("Error");
+      }
+      return;
+    }
+
     if (value === "=") {
       const next = evaluateExpression(display);
       if (next === "Error") {
@@ -70,40 +87,54 @@ export default function Page() {
         ) : null}
         <div className="grid grid-cols-[1fr_5.2rem] gap-3 text-lg">
           <div className="flex flex-col gap-3">
-            <div className="grid grid-cols-4 gap-3">
-              {topRowButtons.map((label) => (
-                <button
-                  key={label}
-                  type="button"
-                  className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-700 font-semibold text-slate-100 transition hover:bg-slate-600"
-                  onClick={() => handleButton(label)}
-                >
-                  {label}
-                </button>
-              ))}
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                type="button"
+                className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-700 font-semibold text-slate-100 transition hover:bg-slate-600"
+                onClick={() => handleButton("C")}
+              >
+                C
+              </button>
+              <button
+                type="button"
+                className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-700 font-semibold text-slate-100 transition hover:bg-slate-600"
+                onClick={() => handleButton("DEL")}
+              >
+                DEL
+              </button>
+              <button
+                type="button"
+                className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-700 font-semibold text-slate-100 transition hover:bg-slate-600"
+                onClick={() => handleButton("÷")}
+              >
+                ÷
+              </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              {numberButtons.map((label) => (
-                <button
-                  key={label}
-                  type="button"
-                  className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-900 text-slate-100 font-semibold transition hover:bg-slate-800"
-                  onClick={() => handleButton(label)}
-                >
-                  {label}
-                </button>
-              ))}
+            {numberRows.map((row, rowIndex) => (
+              <div key={rowIndex} className="grid grid-cols-3 gap-3">
+                {row.map((label) => (
+                  <button
+                    key={label}
+                    type="button"
+                    className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-900 text-slate-100 font-semibold transition hover:bg-slate-800"
+                    onClick={() => handleButton(label)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ))}
+
+            <div className="grid grid-cols-2 gap-3">
               <button
-                key="0"
                 type="button"
-                className="col-span-2 flex h-14 items-center justify-start rounded-2xl border border-white/10 bg-slate-900 pl-6 font-semibold text-slate-100 transition hover:bg-slate-800"
+                className="flex h-14 items-center justify-start rounded-2xl border border-white/10 bg-slate-900 pl-6 font-semibold text-slate-100 transition hover:bg-slate-800"
                 onClick={() => handleButton("0")}
               >
                 0
               </button>
               <button
-                key="."
                 type="button"
                 className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-900 font-semibold text-slate-100 transition hover:bg-slate-800"
                 onClick={() => handleButton(".")}
@@ -114,21 +145,41 @@ export default function Page() {
           </div>
 
           <div className="grid gap-3">
-            {sideOperatorButtons.map((label) => (
-              <button
-                key={label}
-                type="button"
-                className={
-                  "flex h-14 items-center justify-center rounded-2xl border border-white/10 font-semibold transition " +
-                  (label === "="
-                    ? "bg-indigo-500 text-white hover:bg-indigo-600"
-                    : "bg-slate-800 text-slate-200 hover:bg-slate-700")
-                }
-                onClick={() => handleButton(label)}
-              >
-                {label}
-              </button>
-            ))}
+            <button
+              type="button"
+              className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-800 font-semibold text-slate-200 transition hover:bg-slate-700"
+              onClick={() => handleButton("%")}
+            >
+              %
+            </button>
+            <button
+              type="button"
+              className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-800 font-semibold text-slate-200 transition hover:bg-slate-700"
+              onClick={() => handleButton("×")}
+            >
+              ×
+            </button>
+            <button
+              type="button"
+              className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-800 font-semibold text-slate-200 transition hover:bg-slate-700"
+              onClick={() => handleButton("−")}
+            >
+              −
+            </button>
+            <button
+              type="button"
+              className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-slate-800 font-semibold text-slate-200 transition hover:bg-slate-700"
+              onClick={() => handleButton("+")}
+            >
+              +
+            </button>
+            <button
+              type="button"
+              className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-indigo-500 font-semibold text-white transition hover:bg-indigo-600"
+              onClick={() => handleButton("=")}
+            >
+              =
+            </button>
           </div>
         </div>
       </div>
