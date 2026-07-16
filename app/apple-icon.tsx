@@ -7,7 +7,7 @@ export const size = {
 };
 
 export const contentType = "image/png";
-
+// chaqueton
 export default function AppleIcon() {
   return new ImageResponse(
     (
